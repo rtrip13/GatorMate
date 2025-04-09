@@ -13,7 +13,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("OPENAI_API_KEY")
+# Use hardcoded API key from .env file as fallback if environment variable isn't set
+if not api_key:
+    api_key = "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"
+    logger.warning("Using hardcoded API key as fallback. Please set OPENAI_API_KEY environment variable.")
+client = OpenAI(api_key=api_key)
 
 app = Flask(__name__, static_folder='static')
 CORS(app)  # Enable CORS for all routes

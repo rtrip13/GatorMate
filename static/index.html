@@ -2029,6 +2029,68 @@
     .dark-mode .course-details-btn:hover {
       background-color: rgba(255, 255, 255, 0.05);
     }
+    
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ff4444;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .toast-success {
+      background-color: #00C851;
+    }
+    
+    .toast-error {
+      background-color: #ff4444;
+    }
+    
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Loading Spinner */
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(0, 33, 165, 0.3);
+      border-radius: 50%;
+      border-top-color: #0021A5;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    
+    .btn-loading .spinner {
+      width: 16px;
+      height: 16px;
+      border-width: 2px;
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
@@ -2198,8 +2260,8 @@
                 <h4>Current Semester</h4>
                 <div class="semester-selector">
                   <select id="semesterSelect">
-                    <option value="spring2023">Spring 2023</option>
-                    <option value="fall2022">Fall 2022</option>
+                    <option value="spring2023">Spring 2025</option>
+                    <option value="fall2022">Fall 2024</option>
                   </select>
                 </div>
               </div>
@@ -2800,7 +2862,7 @@
           
           // If mental health message, update mood tracking
           if (type === 'mental' && data.mood_score) {
-            const moodHistory = JSON.parse(localStorage.getItem('moodHistory'));
+            const moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
             moodHistory.push({
               date: new Date().toISOString(),
               score: data.mood_score
@@ -2812,15 +2874,18 @@
           }
         } else {
           // Error message
+          const errorData = await res.json();
           const errorMessageEl = document.createElement('div');
           errorMessageEl.className = 'message bot-message';
-          errorMessageEl.textContent = "Sorry, I couldn't process your request at the moment.";
+          errorMessageEl.textContent = errorData.error || "Sorry, I couldn't process your request at the moment.";
           botGroup.appendChild(errorMessageEl);
           
           const botTimeEl = document.createElement('div');
           botTimeEl.className = 'message-time';
           botTimeEl.textContent = formatTime(new Date());
           botGroup.appendChild(botTimeEl);
+          
+          console.error("API Error:", errorData);
         }
       } catch (error) {
         // Remove typing indicator if it exists
@@ -2959,7 +3024,7 @@
         
         if (res.ok) {
           const data = await res.json();
-          const entries = JSON.parse(localStorage.getItem('journalEntries'));
+          const entries = JSON.parse(localStorage.getItem('journalEntries') || '[]');
           
           // Save entry with AI analysis
           const newEntry = {
@@ -2973,7 +3038,7 @@
           localStorage.setItem('journalEntries', JSON.stringify(entries));
           
           // Update mood history
-          const moodHistory = JSON.parse(localStorage.getItem('moodHistory'));
+          const moodHistory = JSON.parse(localStorage.getItem('moodHistory') || '[]');
           moodHistory.push({
             date: newEntry.date,
             score: newEntry.score
@@ -3065,43 +3130,31 @@
             acknowledgeButton.addEventListener('mouseout', () => {
               acknowledgeButton.style.backgroundColor = '#0021A5';
             });
+          } else {
+            const errorData = await chatRes.json();
+            console.error("Chat feedback API error:", errorData);
+            showToast("Could not get feedback on your journal entry");
           }
+        } else {
+          // Reset button
+          saveButton.innerHTML = originalContent;
+          saveButton.disabled = false;
+          
+          // Show error
+          const errorData = await res.json();
+          console.error("Journal analysis API error:", errorData);
+          showToast("Error analyzing journal entry. Please try again later.");
         }
       } catch (error) {
-        console.error("Error saving journal entry:", error);
+        console.error("Journal error:", error);
         
-        // Show error notification
-        const notification = document.createElement('div');
-        notification.style.position = 'fixed';
-        notification.style.bottom = '20px';
-        notification.style.right = '20px';
-        notification.style.backgroundColor = '#ff4444';
-        notification.style.color = 'white';
-        notification.style.padding = '1rem';
-        notification.style.borderRadius = '8px';
-        notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        notification.style.zIndex = '1000';
-        notification.style.animation = 'slideInRight 0.3s ease';
-        notification.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-exclamation-circle"></i>
-            <div>Error saving journal entry. Please try again.</div>
-          </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-          notification.style.animation = 'slideOutRight 0.3s ease';
-          setTimeout(() => {
-            document.body.removeChild(notification);
-          }, 300);
-        }, 3000);
-        
-        // Reset button on error
+        // Reset button
         const saveButton = document.querySelector('.journal-form button');
-        saveButton.innerHTML = '<i class="fas fa-save"></i> Save Entry';
+        saveButton.innerHTML = 'Save Entry';
         saveButton.disabled = false;
+        
+        // Show error toast
+        showToast("Network error. Please check your connection and try again.");
       }
     }
     
@@ -3697,6 +3750,60 @@
         }
       });
     });
+    
+    // Utility function to show toast messages
+    function showToast(message, type = 'error') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <div class="toast-content">
+          <i class="${type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'}"></i>
+          <span>${message}</span>
+        </div>
+      `;
+      document.body.appendChild(toast);
+      
+      // Animate in
+      setTimeout(() => {
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+      }, 10);
+      
+      // Remove after delay
+      setTimeout(() => {
+        toast.style.transform = 'translateY(10px)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 300);
+      }, 3000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the app
+      initApp();
+      
+      // Check if the backend is available
+      checkBackendHealth();
+    });
+    
+    // Check if the backend is accessible
+    async function checkBackendHealth() {
+      try {
+        const res = await fetch('/health', { method: 'GET' });
+        if (!res.ok) {
+          showToast("Warning: Backend services may be unavailable. Some features might not work properly.", "error");
+        }
+      } catch (error) {
+        console.error("Backend health check failed:", error);
+        showToast("Warning: Backend services appear to be offline. Please try again later.", "error");
+      }
+    }
+    
+    function initApp() {
+      // Initialize existing app code
+      // ... existing code ...
+    }
   </script>
 </body>
 </html>

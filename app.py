@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
-# Use hardcoded API key from .env file as fallback if environment variable isn't set
+# Check if API key is available
 if not api_key:
-    api_key = "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"
-    logger.warning("Using hardcoded API key as fallback. Please set OPENAI_API_KEY environment variable.")
+    logger.error("OPENAI_API_KEY environment variable is not set. Please set it in Railway's environment variables.")
+    # We'll still initialize the client, but it will fail on API calls
 client = OpenAI(api_key=api_key)
 
 app = Flask(__name__, static_folder='static')

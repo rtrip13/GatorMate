@@ -1,0 +1,3638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GatorMate - Wellness Support</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0021A5;
+      --secondary: #FA4616;
+      --light-primary: #e6eeff;
+      --light-secondary: #fff1e6;
+      --gray-100: #f8f9fa;
+      --gray-200: #e9ecef;
+      --gray-300: #dee2e6;
+      --gray-800: #343a40;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0, 33, 165, 0.1);
+      --transition: all 0.3s ease;
+      
+      /* Dark mode variables */
+      --dark-bg: #121212;
+      --dark-card: #1e1e1e;
+      --dark-surface: #2d2d2d;
+      --dark-text: #e0e0e0;
+      --dark-border: #444444;
+    }
+    
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: var(--dark-bg);
+      color: var(--dark-text);
+    }
+    
+    body.dark-mode .main-container,
+    body.dark-mode .footer,
+    body.dark-mode .mood-stat,
+    body.dark-mode .journal-entry,
+    body.dark-mode .mood-chart-container {
+      background-color: var(--dark-card);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    body.dark-mode h1, 
+    body.dark-mode h2, 
+    body.dark-mode h3 {
+      color: var(--dark-text);
+    }
+    
+    body.dark-mode .chat-container {
+      background-color: var(--dark-surface);
+    }
+    
+    body.dark-mode input[type="text"], 
+    body.dark-mode textarea {
+      background-color: var(--dark-surface);
+      color: var(--dark-text);
+      border-color: var(--dark-border);
+    }
+    
+    body.dark-mode .user-message {
+      background-color: #2a3a5d;
+      color: var(--dark-text);
+    }
+    
+    body.dark-mode .bot-message {
+      background-color: #4e362a;
+      color: var(--dark-text);
+    }
+    
+    body.dark-mode .no-data {
+      background-color: var(--dark-surface);
+    }
+    
+    /* End of dark mode styles */
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--gray-100);
+      color: var(--gray-800);
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .mode-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    
+    .mode-toggle:hover {
+      transform: scale(1.1);
+      background-color: var(--secondary);
+    }
+    
+    .mode-toggle i {
+      font-size: 1.3rem;
+    }
+    
+    /* Enhanced header */
+    .app-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    .gator-title {
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .gator-title h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .gator-title span {
+      color: white;
+      position: relative;
+    }
+    
+    .gator-title span::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: white;
+      border-radius: 10px;
+    }
+    
+    .gator-mascot {
+      display: inline-block;
+      font-size: 2.5rem;
+      transform: translateY(2px);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+    
+    .app-tagline {
+      font-size: 1.1rem;
+      color: var(--gray-800);
+      margin-top: 0.5rem;
+      text-align: center;
+      font-weight: 500;
+    }
+    
+    /* Enhanced chat interface */
+    .chat-container {
+      height: 450px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      background-color: var(--gray-100);
+      scrollbar-width: thin;
+      scrollbar-color: var(--gray-300) transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+    
+    .chat-day-divider {
+      text-align: center;
+      margin: 1rem 0;
+      position: relative;
+    }
+    
+    .chat-day-divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 1px;
+      background-color: var(--gray-300);
+      z-index: 1;
+    }
+    
+    .chat-day-divider span {
+      background-color: var(--gray-100);
+      padding: 0 10px;
+      position: relative;
+      z-index: 2;
+      font-size: 0.8rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .chat-day-divider span {
+      background-color: var(--dark-surface);
+    }
+    
+    .message-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-width: 80%;
+    }
+    
+    .message-group.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    
+    .message-group.bot {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+    
+    .message-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      margin-bottom: 5px;
+    }
+    
+    .user .message-avatar {
+      background-color: var(--primary);
+    }
+    
+    .bot .message-avatar {
+      background-color: var(--secondary);
+    }
+    
+    .message {
+      margin-bottom: 3px;
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius);
+      max-width: 100%;
+      position: relative;
+      animation: messageIn 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .message:last-child {
+      margin-bottom: 0;
+    }
+    
+    .message-sender {
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+      opacity: 0.7;
+    }
+    
+    .user-message {
+      background-color: var(--light-primary);
+      color: var(--primary);
+      border-top-right-radius: 4px;
+    }
+    
+    .bot-message {
+      background-color: var(--light-secondary);
+      color: var(--gray-800);
+      border-top-left-radius: 4px;
+    }
+    
+    .message-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      text-align: right;
+      margin-top: 3px;
+    }
+    
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 10px;
+      background-color: var(--light-secondary);
+      border-radius: var(--radius);
+      width: fit-content;
+      margin-top: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .typing-indicator.active {
+      opacity: 1;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--secondary);
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typingBounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-4px);
+      }
+    }
+    
+    /* Enhanced input area */
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    
+    input[type="text"], textarea {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+    
+    .input-area button.emoji-toggle {
+      background-color: transparent;
+      color: var(--gray-800);
+      font-size: 1.2rem;
+      padding: 0;
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .input-area button.emoji-toggle:hover {
+      background-color: transparent;
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+    
+    /* Rest of the existing CSS */
+    .main-container {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      border: none;
+      overflow: hidden;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--gray-300);
+      margin-bottom: 1.5rem;
+      gap: 5px;
+    }
+    
+    .tab {
+      padding: 0.8rem 1.2rem;
+      cursor: pointer;
+      border-radius: var(--radius) var(--radius) 0 0;
+      font-weight: 500;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tab i {
+      font-size: 1.2rem;
+    }
+    
+    .tab.active {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .tab:not(.active):hover {
+      background-color: var(--light-primary);
+      color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .chat-container {
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      background-color: var(--gray-100);
+      scrollbar-width: thin;
+      scrollbar-color: var(--gray-300) transparent;
+    }
+    
+    .chat-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-container::-webkit-scrollbar-thumb {
+      background-color: var(--gray-300);
+      border-radius: 10px;
+    }
+    
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    
+    input[type="text"], textarea {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+    
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 33, 165, 0.1);
+    }
+    
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background-color: var(--secondary);
+      transform: translateY(-2px);
+    }
+    
+    .message {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: var(--radius);
+      max-width: 80%;
+      position: relative;
+      animation: messageIn 0.3s ease;
+    }
+    
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .user-message {
+      background-color: var(--light-primary);
+      color: var(--primary);
+      margin-left: auto;
+      border-bottom-right-radius: 0;
+      box-shadow: 0 2px 5px rgba(0, 33, 165, 0.1);
+    }
+    
+    .bot-message {
+      background-color: var(--light-secondary);
+      color: var(--gray-800);
+      margin-right: auto;
+      border-bottom-left-radius: 0;
+      box-shadow: 0 2px 5px rgba(250, 70, 22, 0.1);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--primary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 1rem;
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    
+    .journal-entries {
+      margin-top: 1.5rem;
+      display: grid;
+      gap: 1rem;
+    }
+    
+    .journal-entry {
+      background-color: white;
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+    
+    .journal-entry:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-3px);
+    }
+    
+    .journal-date {
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .journal-text {
+      margin-bottom: 0.8rem;
+      line-height: 1.6;
+    }
+    
+    .journal-mood {
+      display: inline-block;
+      font-style: normal;
+      color: white;
+      background-color: var(--secondary);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    
+    .section-title i {
+      font-size: 1.5rem;
+      color: var(--secondary);
+    }
+    
+    .mood-chart-container {
+      background-color: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    
+    .mood-chart {
+      height: 300px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 0 10px;
+      margin-top: 2rem;
+      padding-top: 25px;
+      position: relative;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 30px;
+    }
+    
+    .mood-chart::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--gray-300);
+    }
+    
+    .mood-chart::after {
+      content: 'Mood Score (1-10)';
+      position: absolute;
+      top: -25px;
+      left: 0;
+      font-size: 0.8rem;
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+    
+    .mood-bar {
+      min-width: 25px;
+      flex: 0 0 25px;
+      position: relative;
+      transition: var(--transition);
+      border-radius: 4px 4px 0 0;
+      min-height: 5px;
+      background: linear-gradient(to top, var(--primary), #5379ff);
+    }
+    
+    /* Add y-axis labels */
+    .mood-chart-y-axis {
+      position: absolute;
+      left: -25px;
+      top: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    
+    .mood-chart-y-label {
+      font-size: 0.7rem;
+      color: var(--gray-800);
+    }
+    
+    /* Add hover tooltip */
+    .mood-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    
+    .mood-bar:hover .mood-bar-tooltip {
+      opacity: 1;
+    }
+    
+    .mood-bar[data-score="1"],
+    .mood-bar[data-score="2"],
+    .mood-bar[data-score="3"] {
+      background: linear-gradient(to top, #ff4500, #ff7043);
+    }
+    
+    .mood-bar[data-score="4"],
+    .mood-bar[data-score="5"],
+    .mood-bar[data-score="6"] {
+      background: linear-gradient(to top, #ff9800, #ffb74d);
+    }
+    
+    .mood-bar[data-score="7"],
+    .mood-bar[data-score="8"],
+    .mood-bar[data-score="9"],
+    .mood-bar[data-score="10"] {
+      background: linear-gradient(to top, #4caf50, #81c784);
+    }
+    
+    .mood-bar:hover {
+      transform: scaleY(1.05);
+      box-shadow: 0 0 10px rgba(0, 33, 165, 0.2);
+    }
+    
+    .mood-bar::before {
+      content: attr(data-score);
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .mood-date {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: var(--gray-800);
+      white-space: nowrap;
+    }
+    
+    .alert {
+      background-color: white;
+      border-left: 4px solid var(--secondary);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      display: none;
+      animation: slideIn 0.5s ease;
+      box-shadow: var(--shadow);
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .alert-title {
+      font-weight: 600;
+      color: var(--secondary);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .alert-content {
+      font-size: 0.9rem;
+    }
+    
+    .alert-action {
+      margin-top: 0.8rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    .alert-action a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .mood-summary {
+      display: flex;
+      justify-content: space-between;
+      margin: 1rem 0;
+    }
+    
+    .mood-stat {
+      text-align: center;
+      background-color: white;
+      padding: 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      flex: 1;
+      margin: 0 0.5rem;
+    }
+    
+    .mood-stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .mood-stat-label {
+      font-size: 0.8rem;
+      color: var(--gray-800);
+    }
+    
+    .no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: var(--gray-800);
+      font-style: italic;
+      background-color: var(--gray-100);
+      border-radius: var(--radius);
+    }
+    
+    .no-data i {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: var(--gray-300);
+    }
+    
+    /* Journal section improvements */
+    .journal-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+      .journal-content {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .journal-left-column,
+    .journal-right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .journal-card {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    .journal-card-header {
+      background: linear-gradient(to right, var(--primary), rgba(0, 33, 165, 0.7));
+      padding: 1rem 1.5rem;
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .journal-card-header h3 {
+      color: white;
+      margin: 0;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .journal-card-body {
+      padding: 1.5rem;
+    }
+    
+    .journal-form textarea {
+      width: 100%;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      padding: 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: var(--transition);
+      min-height: 180px;
+      margin-bottom: 1rem;
+      background-color: var(--gray-100);
+    }
+    
+    body.dark-mode .journal-form textarea {
+      background-color: var(--dark-surface);
+      color: var(--dark-text);
+      border-color: var(--dark-border);
+    }
+    
+    .journal-form textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 33, 165, 0.1);
+    }
+    
+    .journal-entry {
+      background-color: white;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+      overflow: hidden;
+    }
+    
+    .journal-entry:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-3px);
+    }
+    
+    .journal-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      background-color: var(--light-primary);
+    }
+    
+    .journal-date {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    
+    .journal-mood-badge {
+      display: inline-block;
+      color: white;
+      background-color: var(--secondary);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .journal-mood-badge[data-score="1"],
+    .journal-mood-badge[data-score="2"],
+    .journal-mood-badge[data-score="3"] {
+      background-color: #ff4500;
+    }
+    
+    .journal-mood-badge[data-score="4"],
+    .journal-mood-badge[data-score="5"],
+    .journal-mood-badge[data-score="6"] {
+      background-color: #ff9800;
+    }
+    
+    .journal-mood-badge[data-score="7"],
+    .journal-mood-badge[data-score="8"],
+    .journal-mood-badge[data-score="9"],
+    .journal-mood-badge[data-score="10"] {
+      background-color: #4caf50;
+    }
+    
+    .journal-entry-content {
+      padding: 1rem;
+    }
+    
+    .journal-text {
+      margin-bottom: 0;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    
+    .journal-no-entries {
+      padding: 2rem;
+      text-align: center;
+      color: var(--gray-800);
+      background-color: var(--gray-100);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .journal-no-entries i {
+      font-size: 3rem;
+      color: var(--gray-300);
+    }
+    
+    /* End of Journal improvements */
+    
+    /* Academic tab styles */
+    .academic-dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    
+    .academic-section {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    body.dark-mode .academic-section {
+      background-color: var(--dark-card);
+    }
+    
+    .academic-section h3 {
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+    }
+    
+    body.dark-mode .academic-section h3 {
+      color: var(--dark-text);
+    }
+    
+    .academic-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+      .academic-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .academic-card {
+      background-color: var(--gray-100);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.dark-mode .academic-card {
+      background-color: var(--dark-surface);
+    }
+    
+    .academic-card-header {
+      padding: 1rem;
+      background: linear-gradient(to right, var(--primary), rgba(0, 33, 165, 0.7));
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .academic-card-header h4 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    .semester-selector select {
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    
+    .academic-card-body {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .academic-stat {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.3rem;
+    }
+    
+    body.dark-mode .stat-value {
+      color: var(--secondary);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .stat-label {
+      color: var(--dark-text);
+    }
+    
+    .study-analytics {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      width: 100%;
+    }
+    
+    .study-stat {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .study-stat i {
+      font-size: 1.5rem;
+      color: var(--secondary);
+      width: 40px;
+      height: 40px;
+      background-color: rgba(250, 70, 22, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .study-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .study-label {
+      font-size: 0.85rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .study-label {
+      color: var(--dark-text);
+    }
+    
+    /* Course tracker styles */
+    .courses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .course-item {
+      background-color: var(--gray-100);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.dark-mode .course-item {
+      background-color: var(--dark-surface);
+    }
+    
+    .course-header {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+    }
+    
+    body.dark-mode .course-header {
+      background-color: var(--dark-card);
+    }
+    
+    .course-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    body.dark-mode .course-name {
+      color: var(--dark-text);
+    }
+    
+    .course-grade {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .course-grade:not([data-grade="F"]) {
+      color: #4caf50;
+    }
+    
+    .course-grade[data-grade="B-"],
+    .course-grade[data-grade="C+"],
+    .course-grade[data-grade="C"] {
+      color: #ff9800;
+    }
+    
+    .course-grade[data-grade="C-"],
+    .course-grade[data-grade="D+"],
+    .course-grade[data-grade="D"],
+    .course-grade[data-grade="D-"],
+    .course-grade[data-grade="F"] {
+      color: #f44336;
+    }
+    
+    .course-progress {
+      height: 8px;
+      background-color: var(--gray-300);
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), #5379ff);
+    }
+    
+    .course-details {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .course-stat {
+      text-align: center;
+    }
+    
+    .add-course-btn {
+      width: 100%;
+      text-align: center;
+      padding: 0.8rem;
+      background-color: var(--light-primary);
+      color: var(--primary);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    
+    .add-course-btn:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    /* Calendar styles */
+    .calendar-container {
+      background-color: white;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    
+    body.dark-mode .calendar-container {
+      background-color: var(--dark-surface);
+    }
+    
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background-color: var(--light-primary);
+    }
+    
+    body.dark-mode .calendar-header {
+      background-color: var(--dark-card);
+    }
+    
+    .calendar-title {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode .calendar-title {
+      color: var(--dark-text);
+    }
+    
+    .calendar-nav {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .calendar-nav:hover {
+      background-color: var(--secondary);
+      transform: scale(1.1);
+    }
+    
+    .calendar-grid {
+      padding: 1rem;
+      min-height: 200px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    
+    .upcoming-events {
+      border-top: 1px solid var(--gray-300);
+      padding: 1rem;
+    }
+    
+    body.dark-mode .upcoming-events {
+      border-top-color: var(--dark-border);
+    }
+    
+    .event-item {
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      background-color: var(--gray-100);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    
+    body.dark-mode .event-item {
+      background-color: var(--dark-card);
+    }
+    
+    .event-date {
+      font-weight: 600;
+      color: var(--primary);
+      min-width: 60px;
+    }
+    
+    body.dark-mode .event-date {
+      color: var(--secondary);
+    }
+    
+    .event-name {
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    
+    .event-time, .event-location {
+      font-size: 0.85rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .event-time, body.dark-mode .event-location {
+      color: var(--dark-text);
+    }
+    
+    /* Insights styles */
+    .insights-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .insight-card {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    body.dark-mode .insight-card {
+      background-color: var(--dark-surface);
+    }
+    
+    .insight-card.positive .insight-icon {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+    }
+    
+    .insight-card.warning .insight-icon {
+      background-color: rgba(255, 152, 0, 0.1);
+      color: #ff9800;
+    }
+    
+    .insight-card.negative .insight-icon {
+      background-color: rgba(244, 67, 54, 0.1);
+      color: #f44336;
+    }
+    
+    .insight-card.neutral .insight-icon {
+      background-color: rgba(0, 33, 165, 0.1);
+      color: var(--primary);
+    }
+    
+    .insight-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .insight-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .insight-text {
+      font-size: 0.9rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .insight-text {
+      color: var(--dark-text);
+    }
+    
+    /* Resources styles */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+      .resources-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem;
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-decoration: none;
+      transition: var(--transition);
+      text-align: center;
+    }
+    
+    body.dark-mode .resource-card {
+      background-color: var(--dark-surface);
+    }
+    
+    .resource-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .resource-icon {
+      width: 60px;
+      height: 60px;
+      background-color: var(--light-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    
+    .resource-title {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    body.dark-mode .resource-title {
+      color: var(--dark-text);
+    }
+    
+    .resource-text {
+      font-size: 0.85rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .resource-text {
+      color: var(--dark-text);
+    }
+    
+    /* Security and user verification */
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    
+    body.dark-mode .security-badge {
+      background-color: rgba(46, 125, 50, 0.2);
+    }
+    
+    .security-settings {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    
+    body.dark-mode .security-settings {
+      background-color: var(--dark-card);
+    }
+    
+    .security-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    body.dark-mode .security-title {
+      color: var(--dark-text);
+    }
+    
+    .security-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+      .security-options {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .security-option {
+      padding: 1rem;
+      background-color: var(--gray-100);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    body.dark-mode .security-option {
+      background-color: var(--dark-surface);
+    }
+    
+    .security-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--light-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+    
+    .security-info h4 {
+      margin: 0 0 0.3rem 0;
+      font-size: 1rem;
+    }
+    
+    .security-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--gray-800);
+    }
+    
+    body.dark-mode .security-info p {
+      color: var(--dark-text);
+    }
+    
+    /* Crisis detection alert styles */
+    .crisis-alert {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      padding: 1.2rem;
+      background-color: #ffebee;
+      border-left: 4px solid #f44336;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transform: translateY(200%);
+      transition: transform 0.5s ease;
+    }
+    
+    .crisis-alert.active {
+      transform: translateY(0);
+    }
+    
+    body.dark-mode .crisis-alert {
+      background-color: #3e2c2c;
+      border-color: #f44336;
+    }
+    
+    .crisis-icon {
+      width: 50px;
+      height: 50px;
+      background-color: #f44336;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+    }
+    
+    .crisis-content {
+      flex: 1;
+    }
+    
+    .crisis-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+      color: #d32f2f;
+    }
+    
+    body.dark-mode .crisis-title {
+      color: #ff8a80;
+    }
+    
+    .crisis-text {
+      font-size: 0.9rem;
+    }
+    
+    .crisis-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+    
+    .crisis-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .crisis-btn.primary {
+      background-color: #d32f2f;
+      color: white;
+      border: none;
+    }
+    
+    .crisis-btn.primary:hover {
+      background-color: #b71c1c;
+      transform: translateY(-2px);
+    }
+    
+    .crisis-btn.secondary {
+      background-color: transparent;
+      color: #d32f2f;
+      border: 1px solid #d32f2f;
+    }
+    
+    .crisis-btn.secondary:hover {
+      background-color: rgba(211, 47, 47, 0.1);
+    }
+    
+    .crisis-close {
+      background: none;
+      border: none;
+      color: var(--gray-800);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 5px;
+      margin-left: 1rem;
+    }
+    
+    body.dark-mode .crisis-close {
+      color: var(--dark-text);
+    }
+    
+    /* User persona styles */
+    .persona-banner {
+      padding: 1rem;
+      background: linear-gradient(to right, var(--primary), rgba(0, 33, 165, 0.7));
+      color: white;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .persona-avatar {
+      width: 50px;
+      height: 50px;
+      background-color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    
+    .persona-info h3 {
+      margin: 0 0 0.3rem 0;
+      color: white;
+      font-size: 1.2rem;
+    }
+    
+    .persona-info p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .persona-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 0.5rem;
+    }
+    
+    .persona-tag {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+    
+    .insight-icon i {
+      color: inherit;
+    }
+    
+    /* Canvas Integration Styles */
+    .canvas-setup {
+      background-color: var(--gray-50);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .canvas-setup p {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--gray-700);
+    }
+    
+    .canvas-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      color: var(--gray-800);
+    }
+    
+    .form-group input {
+      padding: 0.75rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus {
+      border-color: #0021A5;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0, 33, 165, 0.2);
+    }
+    
+    .help-text {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+    }
+    
+    .btn-primary {
+      background-color: #0021A5;
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary:hover {
+      background-color: #001a84;
+    }
+    
+    .btn-secondary {
+      background-color: var(--gray-200);
+      color: var(--gray-800);
+      border: none;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--gray-300);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+    
+    .canvas-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+    
+    .connected-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #4CAF50;
+      font-weight: 500;
+    }
+    
+    .canvas-summary {
+      display: flex;
+      background-color: var(--gray-50);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      justify-content: space-around;
+    }
+    
+    .summary-stat {
+      text-align: center;
+    }
+    
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #0021A5;
+      margin-bottom: 0.2rem;
+    }
+    
+    .summary-label {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+    }
+    
+    .canvas-courses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .canvas-course {
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+    }
+    
+    .course-expanded {
+      padding: 1rem;
+      background-color: var(--gray-50);
+      border-top: 1px solid var(--gray-200);
+      border-radius: 0 0 12px 12px;
+    }
+    
+    .course-expanded h4 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      color: var(--gray-800);
+    }
+    
+    .assignments-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .assignment-item {
+      background-color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border-left: 3px solid #0021A5;
+    }
+    
+    .assignment-name {
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    
+    .assignment-due, .assignment-points {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+    }
+    
+    .no-assignments {
+      color: var(--gray-600);
+      text-align: center;
+      padding: 1rem;
+      font-style: italic;
+    }
+    
+    .canvas-loading, .canvas-error, .canvas-no-data {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 1rem;
+      text-align: center;
+      color: var(--gray-600);
+    }
+    
+    .canvas-loading i {
+      font-size: 2rem;
+      color: #0021A5;
+    }
+    
+    .canvas-error i {
+      font-size: 2rem;
+      color: #ff4444;
+    }
+    
+    .canvas-no-data i {
+      font-size: 2rem;
+      color: var(--gray-400);
+    }
+    
+    .course-details-btn {
+      width: 100%;
+      background-color: var(--gray-50);
+      border: none;
+      border-top: 1px solid var(--gray-200);
+      padding: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--gray-700);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s;
+    }
+    
+    .course-details-btn:hover {
+      background-color: var(--gray-100);
+    }
+    
+    .stat-value.small {
+      font-size: 0.8rem;
+      word-break: break-all;
+    }
+    
+    /* Dark mode adjustments for Canvas integration */
+    .dark-mode .canvas-setup,
+    .dark-mode .canvas-summary,
+    .dark-mode .course-expanded {
+      background-color: var(--dark-card);
+    }
+    
+    .dark-mode .form-group input {
+      background-color: var(--dark-input);
+      border-color: var(--dark-border);
+      color: var(--dark-text);
+    }
+    
+    .dark-mode .assignment-item {
+      background-color: var(--dark-card);
+    }
+    
+    .dark-mode .btn-secondary {
+      background-color: var(--dark-card);
+      color: var(--dark-text);
+    }
+    
+    .dark-mode .btn-outline {
+      border-color: var(--dark-border);
+      color: var(--dark-text);
+    }
+    
+    .dark-mode .btn-outline:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .dark-mode .course-details-btn {
+      background-color: var(--dark-card);
+      border-top-color: var(--dark-border);
+      color: var(--dark-text);
+    }
+    
+    .dark-mode .course-details-btn:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="mode-toggle" onclick="toggleDarkMode()">
+    <i class="fas fa-moon"></i>
+  </div>
+  
+  <div class="app-header">
+    <div class="gator-title">
+      <span class="gator-mascot">🐊</span>
+      <h1>Gator<span>Mate</span></h1>
+    </div>
+    <div class="app-tagline">Your Gator-powered wellness companion</div>
+  </div>
+  
+  <div class="main-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="mental">
+        <i class="fas fa-brain"></i> Mental Health
+      </div>
+      <div class="tab" data-tab="physical">
+        <i class="fas fa-heartbeat"></i> Physical Wellness
+      </div>
+      <div class="tab" data-tab="journal">
+        <i class="fas fa-book"></i> Journal
+      </div>
+      <div class="tab" data-tab="academic">
+        <i class="fas fa-graduation-cap"></i> Academic
+      </div>
+    </div>
+    
+    <div id="mental-tab" class="tab-content active">
+      <div id="alert-mental" class="alert">
+        <div class="alert-title">
+          <i class="fas fa-exclamation-circle"></i>
+          Wellness Check
+        </div>
+        <div class="alert-content">
+          Your recent mood scores indicate you've been feeling down for several days.
+        </div>
+        <div class="alert-action">
+          Consider connecting with the UF Counseling & Wellness Center: <a href="tel:3523921575">(352) 392-1575</a>
+        </div>
+      </div>
+      
+      <div id="chatBox" class="chat-container">
+        <!-- Chat messages will appear here -->
+      </div>
+      
+      <div class="input-area">
+        <button class="emoji-toggle">
+          <i class="far fa-smile"></i>
+        </button>
+        <input type="text" id="userInput" placeholder="How are you feeling today, Gator?" />
+        <button onclick="sendMessage('mental')">
+          <i class="fas fa-paper-plane"></i> Send
+        </button>
+      </div>
+    </div>
+    
+    <div id="physical-tab" class="tab-content">
+      <div id="alert-physical" class="alert">
+        <div class="alert-title">
+          <i class="fas fa-heartbeat"></i>
+          Physical Health Alert
+        </div>
+        <div class="alert-content">
+          You've mentioned physical discomfort multiple times recently.
+        </div>
+        <div class="alert-action">
+          Consider visiting the UF Student Health Care Center: <a href="tel:3523921161">(352) 392-1161</a>
+        </div>
+      </div>
+      
+      <div id="physicalChatBox" class="chat-container">
+        <!-- Physical health chat messages will appear here -->
+      </div>
+      
+      <div class="input-area">
+        <button class="emoji-toggle">
+          <i class="far fa-smile"></i>
+        </button>
+        <input type="text" id="physicalInput" placeholder="Any physical wellness concerns today?" />
+        <button onclick="sendMessage('physical')">
+          <i class="fas fa-paper-plane"></i> Send
+        </button>
+      </div>
+    </div>
+    
+    <div id="journal-tab" class="tab-content">
+      <div class="journal-content">
+        <div class="journal-left-column">
+          <div class="journal-card">
+            <div class="journal-card-header">
+              <h3><i class="fas fa-pen"></i> New Journal Entry</h3>
+            </div>
+            <div class="journal-card-body">
+              <div class="journal-form">
+                <textarea id="journalEntry" placeholder="Write about your day, feelings, or anything you'd like to track..."></textarea>
+                <button onclick="saveJournal()" class="btn-primary">
+                  <i class="fas fa-save"></i> Save Entry
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="journal-card">
+            <div class="journal-card-header">
+              <h3><i class="fas fa-chart-bar"></i> Mood Stats</h3>
+            </div>
+            <div class="journal-card-body">
+              <div id="moodSummary" class="mood-summary">
+                <!-- Mood stats will be inserted here -->
+              </div>
+            </div>
+          </div>
+          
+          <div class="journal-card">
+            <div class="journal-card-header">
+              <h3><i class="fas fa-chart-line"></i> Mood Trends</h3>
+            </div>
+            <div class="journal-card-body">
+              <div id="moodChart" class="mood-chart">
+                <!-- Mood chart will be rendered here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="journal-right-column">
+          <div class="journal-card">
+            <div class="journal-card-header">
+              <h3><i class="fas fa-history"></i> Journal History</h3>
+              <span id="entry-count" class="journal-count">0 entries</span>
+            </div>
+            <div class="journal-card-body">
+              <div id="journalEntries" class="journal-entries">
+                <!-- Journal entries will be displayed here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="academic-tab" class="tab-content">
+      <div id="alert-academic" class="alert">
+        <div class="alert-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          Academic Alert
+        </div>
+        <div class="alert-content">
+          Your academic performance trend suggests you may be struggling with some courses.
+        </div>
+        <div class="alert-action">
+          Consider visiting UF's Academic Advising Center: <a href="tel:3523921521">(352) 392-1521</a> or the <a href="https://teachingcenter.ufl.edu/" target="_blank">UF Teaching Center</a>
+        </div>
+      </div>
+      
+      <div class="academic-dashboard">
+        <!-- Academic tracking UI will be here -->
+        <div class="academic-section">
+          <h3><i class="fas fa-chart-line"></i> Performance Overview</h3>
+          <div class="academic-cards">
+            <div class="academic-card">
+              <div class="academic-card-header">
+                <h4>Current Semester</h4>
+                <div class="semester-selector">
+                  <select id="semesterSelect">
+                    <option value="spring2023">Spring 2023</option>
+                    <option value="fall2022">Fall 2022</option>
+                  </select>
+                </div>
+              </div>
+              <div class="academic-card-body">
+                <div class="academic-stat gpa">
+                  <div class="stat-value">3.7</div>
+                  <div class="stat-label">GPA</div>
+                </div>
+                <div class="academic-stat courses">
+                  <div class="stat-value">5</div>
+                  <div class="stat-label">Courses</div>
+                </div>
+                <div class="academic-stat credits">
+                  <div class="stat-value">15</div>
+                  <div class="stat-label">Credits</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="academic-card">
+              <div class="academic-card-header">
+                <h4>Study Analytics</h4>
+              </div>
+              <div class="academic-card-body">
+                <div class="study-analytics">
+                  <div class="study-stat">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                      <div class="study-value">24.5</div>
+                      <div class="study-label">Hours/Week</div>
+                    </div>
+                  </div>
+                  <div class="study-stat">
+                    <i class="fas fa-tasks"></i>
+                    <div>
+                      <div class="study-value">85%</div>
+                      <div class="study-label">Assignment Completion</div>
+                    </div>
+                  </div>
+                  <div class="study-stat">
+                    <i class="fas fa-user-clock"></i>
+                    <div>
+                      <div class="study-value">92%</div>
+                      <div class="study-label">Attendance</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Replace Canvas integration section with hardcoded courses -->
+        <div class="academic-section">
+          <h3><i class="fas fa-graduation-cap"></i> Spring 2025 Courses</h3>
+          <div class="semester-header">
+            <div class="semester-info">
+              <div class="semester-title">Current Semester: Spring 2025</div>
+              <div class="semester-dates">January 6 - May 2, 2025</div>
+            </div>
+            <div class="semester-stats">
+              <div class="stat">
+                <div class="stat-value">3.82</div>
+                <div class="stat-label">Current GPA</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Courses</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">17</div>
+                <div class="stat-label">Credits</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="courses-list">
+            <!-- Course 1: Computational Linear Algebra -->
+            <div class="course-item">
+              <div class="course-header">
+                <div class="course-name">MAS3114 - Computational Linear Algebra</div>
+                <div class="course-grade">A-</div>
+              </div>
+              <div class="course-progress">
+                <div class="progress-bar" style="width: 88%"></div>
+              </div>
+              <div class="course-details">
+                <div class="course-stat">
+                  <div class="stat-label">Assignments</div>
+                  <div class="stat-value">14/16</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Exams</div>
+                  <div class="stat-value">1/2</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Projects</div>
+                  <div class="stat-value">1/1</div>
+                </div>
+              </div>
+              <button class="course-details-btn" data-course-id="mas3114">
+                <i class="fas fa-chevron-down"></i> Details
+              </button>
+              <div class="course-expanded" id="course-expanded-mas3114" style="display: none;">
+                <h4>Recent Performance</h4>
+                <div class="course-expanded-content">
+                  <p>You're excelling in the theoretical aspects of eigenvalues and eigenvectors, but the Python implementation of matrix decomposition techniques could use more practice. Consider using the NumPy and SciPy libraries more effectively in your code.</p>
+                  <div class="upcoming-deadlines">
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 12</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Matrix Factorization Assignment</div>
+                        <div class="deadline-time">11:59 PM</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 25</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Exam</div>
+                        <div class="deadline-time">2:00 PM - 4:00 PM</div>
+                        <div class="deadline-location">Little Hall 101</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Course 2: General Chemistry 1 -->
+            <div class="course-item">
+              <div class="course-header">
+                <div class="course-name">CHM2045 - General Chemistry 1</div>
+                <div class="course-grade">B+</div>
+              </div>
+              <div class="course-progress">
+                <div class="progress-bar" style="width: 79%"></div>
+              </div>
+              <div class="course-details">
+                <div class="course-stat">
+                  <div class="stat-label">Quizzes</div>
+                  <div class="stat-value">8/10</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Exams</div>
+                  <div class="stat-value">2/3</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Homework</div>
+                  <div class="stat-value">12/15</div>
+                </div>
+              </div>
+              <button class="course-details-btn" data-course-id="chm2045">
+                <i class="fas fa-chevron-down"></i> Details
+              </button>
+              <div class="course-expanded" id="course-expanded-chm2045" style="display: none;">
+                <h4>Recent Performance</h4>
+                <div class="course-expanded-content">
+                  <p>Your understanding of stoichiometry and gas laws is strong, but thermochemistry concepts need improvement. The most recent exam showed gaps in Hess's Law applications. Consider visiting Dr. Johnson's office hours on Tuesdays and attending the peer-led study sessions in the Chemistry Learning Center.</p>
+                  <div class="upcoming-deadlines">
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 8</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Equilibrium Quiz</div>
+                        <div class="deadline-time">In class</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 18</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Exam Review Session</div>
+                        <div class="deadline-time">5:00 PM - 7:00 PM</div>
+                        <div class="deadline-location">Flint Hall 50</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Course 3: Engineering Economy -->
+            <div class="course-item">
+              <div class="course-header">
+                <div class="course-name">EIN3354 - Engineering Economy</div>
+                <div class="course-grade">A</div>
+              </div>
+              <div class="course-progress">
+                <div class="progress-bar" style="width: 94%"></div>
+              </div>
+              <div class="course-details">
+                <div class="course-stat">
+                  <div class="stat-label">Case Studies</div>
+                  <div class="stat-value">4/5</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Exams</div>
+                  <div class="stat-value">2/2</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Project</div>
+                  <div class="stat-value">1/1</div>
+                </div>
+              </div>
+              <button class="course-details-btn" data-course-id="ein3354">
+                <i class="fas fa-chevron-down"></i> Details
+              </button>
+              <div class="course-expanded" id="course-expanded-ein3354" style="display: none;">
+                <h4>Recent Performance</h4>
+                <div class="course-expanded-content">
+                  <p>Outstanding analysis in your renewable energy investment project! Your comparative cost analysis demonstrated exceptional understanding of time value of money principles and depreciation models. Professor Martinez has noted your work as exemplary. Consider submitting an extended version to the undergraduate engineering symposium next month.</p>
+                  <div class="upcoming-deadlines">
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 15</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Case Study: Sustainability ROI</div>
+                        <div class="deadline-time">11:59 PM</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 28</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Exam</div>
+                        <div class="deadline-time">10:00 AM - 12:00 PM</div>
+                        <div class="deadline-location">Weil Hall 238</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Course 4: Principles of Entrepreneurship -->
+            <div class="course-item">
+              <div class="course-header">
+                <div class="course-name">ENT3003 - Principles of Entrepreneurship</div>
+                <div class="course-grade">A</div>
+              </div>
+              <div class="course-progress">
+                <div class="progress-bar" style="width: 96%"></div>
+              </div>
+              <div class="course-details">
+                <div class="course-stat">
+                  <div class="stat-label">Presentations</div>
+                  <div class="stat-value">3/3</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Sage Vantage Quizzes</div>
+                  <div class="stat-value">30/32</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Case Analyses</div>
+                  <div class="stat-value">5/5</div>
+                </div>
+              </div>
+              <button class="course-details-btn" data-course-id="ent3003">
+                <i class="fas fa-chevron-down"></i> Details
+              </button>
+              <div class="course-expanded" id="course-expanded-ent3003" style="display: none;">
+                <h4>Recent Performance</h4>
+                <div class="course-expanded-content">
+                  <p>Your startup pitch for the health-tech solution was innovative and thorough. The market analysis demonstrated deep understanding of customer discovery and validation processes. Your financial projections need refinement - specifically, the customer acquisition cost calculations appear optimistic. Connect with the Entrepreneurship Club's mentor network for guidance on realistic scaling metrics.</p>
+                  <div class="upcoming-deadlines">
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 10</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Business Plan Draft</div>
+                        <div class="deadline-time">11:59 PM</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 22</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Pitch Competition</div>
+                        <div class="deadline-time">3:00 PM - 6:00 PM</div>
+                        <div class="deadline-location">Hough Hall Auditorium</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Course 5: Chemistry Lab -->
+            <div class="course-item">
+              <div class="course-header">
+                <div class="course-name">CHM2045L - General Chemistry 1 Lab</div>
+                <div class="course-grade">A-</div>
+              </div>
+              <div class="course-progress">
+                <div class="progress-bar" style="width: 75%"></div>
+              </div>
+              <div class="course-details">
+                <div class="course-stat">
+                  <div class="stat-label">Pre-Labs</div>
+                  <div class="stat-value">9/10</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Lab Reports</div>
+                  <div class="stat-value">8/10</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Practicals</div>
+                  <div class="stat-value">1/2</div>
+                </div>
+              </div>
+              <button class="course-details-btn" data-course-id="chm2045l">
+                <i class="fas fa-chevron-down"></i> Details
+              </button>
+              <div class="course-expanded" id="course-expanded-chm2045l" style="display: none;">
+                <h4>Recent Performance</h4>
+                <div class="course-expanded-content">
+                  <p>Your lab techniques have shown improvement, particularly in titration precision. However, your error analysis sections in recent lab reports lack depth. The TA noted that your measurements for the calorimetry experiment had high variance, suggesting inconsistent technique. Review the proper use of graduated cylinders and pipettes before the final practical exam.</p>
+                  <div class="upcoming-deadlines">
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 14</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Lab Report: Acid-Base Equilibria</div>
+                        <div class="deadline-time">11:59 PM</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 24</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Practical Exam</div>
+                        <div class="deadline-time">During scheduled lab period</div>
+                        <div class="deadline-location">Leigh Hall - Lab 207</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Course 6: Intro to Industrial Engineering -->
+            <div class="course-item">
+              <div class="course-header">
+                <div class="course-name">EIN3101 - Introduction to Industrial & Systems Engineering</div>
+                <div class="course-grade">A-</div>
+              </div>
+              <div class="course-progress">
+                <div class="progress-bar" style="width: 87%"></div>
+              </div>
+              <div class="course-details">
+                <div class="course-stat">
+                  <div class="stat-label">Assignments</div>
+                  <div class="stat-value">7/8</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Quizzes</div>
+                  <div class="stat-value">5/6</div>
+                </div>
+                <div class="course-stat">
+                  <div class="stat-label">Team Project</div>
+                  <div class="stat-value">2/3</div>
+                </div>
+              </div>
+              <button class="course-details-btn" data-course-id="ein3101">
+                <i class="fas fa-chevron-down"></i> Details
+              </button>
+              <div class="course-expanded" id="course-expanded-ein3101" style="display: none;">
+                <h4>Recent Performance</h4>
+                <div class="course-expanded-content">
+                  <p>Your process optimization models demonstrate strong analytical skills, especially in the healthcare systems simulation. The faculty noted your innovative approach to patient flow analysis. However, your team's manufacturing case study presentation lacked sufficient cost-benefit analysis. Consider leveraging the skills from your Engineering Economy course to strengthen this weakness in your final project phase.</p>
+                  <div class="upcoming-deadlines">
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 11</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Project Milestone: Implementation Plan</div>
+                        <div class="deadline-time">11:59 PM</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 20</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Industry Guest Speaker: Optimization in Logistics</div>
+                        <div class="deadline-time">4:00 PM - 5:30 PM</div>
+                        <div class="deadline-location">Weil Hall 406</div>
+                      </div>
+                    </div>
+                    <div class="deadline-item">
+                      <div class="deadline-date">Apr 29</div>
+                      <div class="deadline-details">
+                        <div class="deadline-name">Final Exam</div>
+                        <div class="deadline-time">1:00 PM - 3:00 PM</div>
+                        <div class="deadline-location">LAR 310</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="academic-section">
+          <h3><i class="fas fa-lightbulb"></i> Academic Insights</h3>
+          <div class="insights-container">
+            <div class="insight-card positive">
+              <div class="insight-icon">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+              <div class="insight-content">
+                <div class="insight-title">Engineering Economy Excellence</div>
+                <div class="insight-text">Your project analysis on renewable energy investment has been highlighted by Prof. Martinez as exemplary work. Your understanding of ROI calculations and sensitivity analysis demonstrate advanced proficiency in the subject.</div>
+              </div>
+            </div>
+            
+            <div class="insight-card warning">
+              <div class="insight-icon">
+                <i class="fas fa-exclamation"></i>
+              </div>
+              <div class="insight-content">
+                <div class="insight-title">Chemistry Concept Gap</div>
+                <div class="insight-text">Your performance in thermochemistry (particularly Hess's Law applications) is significantly below your performance in other chemistry topics. Consider scheduling a targeted review session with the Chemistry Learning Center before the final.</div>
+              </div>
+            </div>
+            
+            <div class="insight-card neutral">
+              <div class="insight-icon">
+                <i class="fas fa-sync"></i>
+              </div>
+              <div class="insight-content">
+                <div class="insight-title">Balancing Technical & Business Skills</div>
+                <div class="insight-text">You're effectively bridging engineering analytical skills with entrepreneurial thinking. Continue leveraging your technical background in your business plan development for maximum impact in your entrepreneurship course.</div>
+              </div>
+            </div>
+            
+            <div class="insight-card positive">
+              <div class="insight-icon">
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="insight-content">
+                <div class="insight-title">Cross-Disciplinary Integration</div>
+                <div class="insight-text">Your combination of computational skills from Linear Algebra with process optimization techniques in your Industrial Engineering project demonstrates excellent interdisciplinary thinking. This integration sets your work apart.</div>
+              </div>
+            </div>
+            
+            <div class="insight-card warning">
+              <div class="insight-icon">
+                <i class="fas fa-flask"></i>
+              </div>
+              <div class="insight-content">
+                <div class="insight-title">Laboratory Technique Precision</div>
+                <div class="insight-text">Inconsistent measurement precision is affecting your Chemistry Lab grades. The variation in your calorimetry experiment results indicates a need for more careful technique. Schedule a practice session with your TA before the final practical.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    For UF students, by UF students. Go Gators! 🧡💙
+  </div>
+
+  <script>
+    // Base URL for API requests - replace with your deployed backend URL
+    const baseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+      ? '' // Empty string for local development (uses relative paths)
+      : 'https://your-backend-url.com'; // Your deployed backend URL here
+    
+    // Dark mode toggle function
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      
+      // Store preference
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode);
+    }
+    
+    // Load saved dark mode preference
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedDarkMode = localStorage.getItem('darkMode');
+      if (savedDarkMode === 'true') {
+        document.body.classList.add('dark-mode');
+      }
+    });
+    
+    // Create typing indicator
+    function createTypingIndicator() {
+      const indicator = document.createElement('div');
+      indicator.className = 'typing-indicator';
+      indicator.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+      return indicator;
+    }
+    
+    // Format message timestamp
+    function formatTime(date) {
+      return new Date(date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+    
+    // Send message for chat functionality with enhanced UI
+    async function sendMessage(context) {
+      const inputField = context === 'mental' ? document.getElementById('userInput') : document.getElementById('physicalInput');
+      const userMessage = inputField.value.trim();
+      
+      if (!userMessage) return;
+      
+      // Disable input and show sending state
+      inputField.value = '';
+      inputField.disabled = true;
+      const sendButton = inputField.nextElementSibling;
+      sendButton.disabled = true;
+      sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      
+      // Determine which chat box to use based on context
+      const chatBox = context === 'mental' ? document.getElementById('chatBox') : document.getElementById('physicalChatBox');
+      
+      // Add user message to chat
+      const userBubble = document.createElement('div');
+      userBubble.classList.add('chat-bubble', 'user');
+      userBubble.innerHTML = `<p>${userMessage}</p>`;
+      chatBox.appendChild(userBubble);
+      
+      // Scroll to bottom
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      // Add loading indicator
+      const loadingBubble = document.createElement('div');
+      loadingBubble.classList.add('chat-bubble', 'assistant', 'loading-bubble');
+      loadingBubble.innerHTML = `
+        <div class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      `;
+      chatBox.appendChild(loadingBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      try {
+        // Send to backend
+        const response = await fetch(`${baseUrl}/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            context: context
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Remove loading bubble
+          chatBox.removeChild(loadingBubble);
+          
+          // Add assistant response
+          const assistantBubble = document.createElement('div');
+          assistantBubble.classList.add('chat-bubble', 'assistant');
+          
+          // Process line breaks
+          const formattedText = data.reply.replace(/\n/g, '<br>');
+          assistantBubble.innerHTML = `<p>${formattedText}</p>`;
+          
+          chatBox.appendChild(assistantBubble);
+          
+        } else {
+          // Handle error
+          loadingBubble.innerHTML = '<p>Sorry, there was an error processing your message. Please try again.</p>';
+          loadingBubble.classList.remove('loading-bubble');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        loadingBubble.innerHTML = '<p>Sorry, there was an error connecting to the assistant. Please check your connection and try again.</p>';
+        loadingBubble.classList.remove('loading-bubble');
+      } finally {
+        // Re-enable input
+        inputField.disabled = false;
+        inputField.focus();
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+        
+        // Scroll to bottom again
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+      });
+    });
+    
+    // Initialize data storage
+    if (!localStorage.getItem('journalEntries')) {
+      localStorage.setItem('journalEntries', JSON.stringify([]));
+    }
+    
+    if (!localStorage.getItem('moodHistory')) {
+      localStorage.setItem('moodHistory', JSON.stringify([]));
+    }
+    
+    // Load and display journal entries with improved UI
+    function loadJournalEntries() {
+      const entries = JSON.parse(localStorage.getItem('journalEntries'));
+      const container = document.getElementById('journalEntries');
+      const entryCount = document.getElementById('entry-count');
+      
+      if (entries.length === 0) {
+        container.innerHTML = `
+          <div class="journal-no-entries">
+            <i class="fas fa-book-open"></i>
+            <p>No entries yet. Start journaling to track your wellness journey!</p>
+            <p>Journal entries help you reflect on your emotions and track your mental health over time.</p>
+          </div>
+        `;
+        entryCount.textContent = '0 entries';
+        return;
+      }
+      
+      entryCount.textContent = `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'}`;
+      
+      container.innerHTML = '';
+      entries.reverse().forEach(entry => {
+        container.innerHTML += `
+          <div class="journal-entry">
+            <div class="journal-entry-header">
+              <div class="journal-date">${formatJournalDate(entry.date)}</div>
+              <div class="journal-mood-badge" data-score="${entry.score}">${entry.mood} (${entry.score}/10)</div>
+            </div>
+            <div class="journal-entry-content">
+              <p class="journal-text">${entry.text}</p>
+            </div>
+          </div>
+        `;
+      });
+      
+      updateMoodChart();
+      updateMoodSummary();
+      checkWellness();
+    }
+    
+    // Format journal date in a more readable format
+    function formatJournalDate(dateString) {
+      const date = new Date(dateString);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (date.toDateString() === today.toDateString()) {
+        return `Today, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return `Yesterday, ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      } else {
+        return date.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+    }
+    
+    // Improved journal entry saving with enhanced UX
+    async function saveJournal() {
+      const journalText = document.getElementById('journalEntry').value.trim();
+      if (!journalText) {
+        // Shake the textarea to indicate it's required
+        const textarea = document.getElementById('journalEntry');
+        textarea.style.animation = 'none';
+        setTimeout(() => {
+          textarea.style.animation = 'shake 0.5s';
+        }, 10);
+        return;
+      }
+      
+      try {
+        // Show loading state
+        const saveButton = document.querySelector('.journal-form button');
+        const originalContent = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+        saveButton.disabled = true;
+        
+        // Get AI analysis of the journal entry
+        const res = await fetch(`${baseUrl}/analyze_journal`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({entry: journalText})
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          const entries = JSON.parse(localStorage.getItem('journalEntries'));
+          
+          // Save entry with AI analysis
+          const newEntry = {
+            date: new Date().toISOString(),
+            text: journalText,
+            mood: data.mood,
+            score: data.score // Numerical score from 1-10, 10 being most positive
+          };
+          
+          entries.push(newEntry);
+          localStorage.setItem('journalEntries', JSON.stringify(entries));
+          
+          // Update mood history
+          const moodHistory = JSON.parse(localStorage.getItem('moodHistory'));
+          moodHistory.push({
+            date: newEntry.date,
+            score: newEntry.score
+          });
+          localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+          
+          // Clear the input
+          document.getElementById('journalEntry').value = '';
+          
+          // Reload journal entries
+          loadJournalEntries();
+          
+          // Give AI feedback about entry
+          const chatRes = await fetch(`${baseUrl}/chat`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              message: "I just wrote in my journal: " + journalText,
+              context: "journal_entry",
+              analysis: data
+            })
+          });
+          
+          // Reset button
+          saveButton.innerHTML = originalContent;
+          saveButton.disabled = false;
+          
+          if (chatRes.ok) {
+            const chatData = await chatRes.json();
+            
+            // Create custom feedback dialog with improved styling
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.classList.add('feedback-dialog');
+            feedbackDiv.style.position = 'fixed';
+            feedbackDiv.style.top = '50%';
+            feedbackDiv.style.left = '50%';
+            feedbackDiv.style.transform = 'translate(-50%, -50%)';
+            feedbackDiv.style.backgroundColor = 'white';
+            feedbackDiv.style.padding = '1.5rem';
+            feedbackDiv.style.borderRadius = '12px';
+            feedbackDiv.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.2)';
+            feedbackDiv.style.zIndex = '1000';
+            feedbackDiv.style.maxWidth = '500px';
+            feedbackDiv.style.width = '90%';
+            feedbackDiv.style.animation = 'fadeIn 0.3s ease';
+            
+            // Add dark mode support for the dialog
+            if (document.body.classList.contains('dark-mode')) {
+              feedbackDiv.style.backgroundColor = '#2d2d2d';
+              feedbackDiv.style.color = '#e0e0e0';
+            }
+            
+            feedbackDiv.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: ${document.body.classList.contains('dark-mode') ? '#e0e0e0' : '#0021A5'};">Journal Entry Saved</h3>
+                <button id="close-feedback" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: ${document.body.classList.contains('dark-mode') ? '#999' : '#777'};">×</button>
+              </div>
+              <div style="display: flex; margin-bottom: 1rem; gap: 1rem;">
+                <div style="flex: 1; padding: 0.8rem; border-radius: 8px; background-color: ${document.body.classList.contains('dark-mode') ? '#1e1e1e' : '#f8f9fa'}; text-align: center;">
+                  <div style="font-weight: 600; margin-bottom: 0.3rem; font-size: 0.9rem;">Mood</div>
+                  <div style="font-size: 1.2rem; color: #FA4616;">${data.mood}</div>
+                </div>
+                <div style="flex: 1; padding: 0.8rem; border-radius: 8px; background-color: ${document.body.classList.contains('dark-mode') ? '#1e1e1e' : '#f8f9fa'}; text-align: center;">
+                  <div style="font-weight: 600; margin-bottom: 0.3rem; font-size: 0.9rem;">Score</div>
+                  <div style="font-size: 1.2rem; color: #0021A5;">${data.score}/10</div>
+                </div>
+              </div>
+              <div style="margin-bottom: 1rem; padding: 1rem; background-color: ${document.body.classList.contains('dark-mode') ? '#1e1e1e' : '#f8f9fa'}; border-radius: 8px; border-left: 4px solid #0021A5;">
+                ${chatData.reply}
+              </div>
+              <button id="acknowledge-feedback" style="width: 100%; background-color: #0021A5; color: white; border: none; padding: 0.8rem; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background-color 0.3s ease;">Got it</button>
+            `;
+            
+            document.body.appendChild(feedbackDiv);
+            
+            // Add event listeners for closing the dialog
+            document.getElementById('close-feedback').addEventListener('click', () => {
+              document.body.removeChild(feedbackDiv);
+            });
+            document.getElementById('acknowledge-feedback').addEventListener('click', () => {
+              document.body.removeChild(feedbackDiv);
+            });
+            
+            // Add hover effect to the Got it button
+            const acknowledgeButton = document.getElementById('acknowledge-feedback');
+            acknowledgeButton.addEventListener('mouseover', () => {
+              acknowledgeButton.style.backgroundColor = '#FA4616';
+            });
+            acknowledgeButton.addEventListener('mouseout', () => {
+              acknowledgeButton.style.backgroundColor = '#0021A5';
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error saving journal entry:", error);
+        
+        // Show error notification
+        const notification = document.createElement('div');
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = '#ff4444';
+        notification.style.color = 'white';
+        notification.style.padding = '1rem';
+        notification.style.borderRadius = '8px';
+        notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        notification.style.zIndex = '1000';
+        notification.style.animation = 'slideInRight 0.3s ease';
+        notification.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>Error saving journal entry. Please try again.</div>
+          </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.style.animation = 'slideOutRight 0.3s ease';
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 300);
+        }, 3000);
+        
+        // Reset button on error
+        const saveButton = document.querySelector('.journal-form button');
+        saveButton.innerHTML = '<i class="fas fa-save"></i> Save Entry';
+        saveButton.disabled = false;
+      }
+    }
+    
+    // Add shake animation for form validation
+    document.head.insertAdjacentHTML('beforeend', `
+      <style>
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+      </style>
+    `);
+    
+    // Update the mood summary statistics
+    function updateMoodSummary() {
+      const moodHistory = JSON.parse(localStorage.getItem('moodHistory'));
+      const summaryContainer = document.getElementById('moodSummary');
+      
+      if (moodHistory.length === 0) {
+        summaryContainer.innerHTML = `
+          <div class="no-data">
+            <i class="fas fa-chart-bar"></i>
+            <div>No mood data available yet</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Group by context
+      const contextGroups = {
+        mental: moodHistory.filter(item => item.context === 'mental'),
+        physical: moodHistory.filter(item => item.context === 'physical'),
+        journal: moodHistory.filter(item => item.context === 'journal_entry'),
+        all: moodHistory
+      };
+      
+      // Calculate averages
+      const avgAll = contextGroups.all.reduce((sum, item) => sum + item.score, 0) / contextGroups.all.length;
+      
+      // Calculate trend (improving or declining)
+      let trendIcon, trendColor, trendText;
+      if (moodHistory.length >= 3) {
+        const recentScores = moodHistory.slice(-3).map(item => item.score);
+        const oldestRecent = recentScores[0];
+        const newest = recentScores[recentScores.length - 1];
+        
+        if (newest > oldestRecent) {
+          trendIcon = 'fa-arrow-trend-up';
+          trendColor = '#4caf50';
+          trendText = 'Improving';
+        } else if (newest < oldestRecent) {
+          trendIcon = 'fa-arrow-trend-down';
+          trendColor = '#ff4500';
+          trendText = 'Declining';
+        } else {
+          trendIcon = 'fa-arrow-right';
+          trendColor = '#ff9800';
+          trendText = 'Stable';
+        }
+      } else {
+        trendIcon = 'fa-minus';
+        trendColor = '#999';
+        trendText = 'Not enough data';
+      }
+      
+      // Show stats
+      summaryContainer.innerHTML = `
+        <div class="mood-stat">
+          <div class="mood-stat-value">${avgAll.toFixed(1)}</div>
+          <div class="mood-stat-label">Average Mood</div>
+        </div>
+        <div class="mood-stat">
+          <div class="mood-stat-value">${moodHistory.length}</div>
+          <div class="mood-stat-label">Total Entries</div>
+        </div>
+        <div class="mood-stat">
+          <div class="mood-stat-value" style="color: ${trendColor}">
+            <i class="fas ${trendIcon}" style="font-size: 0.8em;"></i> ${trendText}
+          </div>
+          <div class="mood-stat-label">Recent Trend</div>
+        </div>
+      `;
+    }
+    
+    // Update the mood chart visualization with enhanced features
+    function updateMoodChart() {
+      const moodHistory = JSON.parse(localStorage.getItem('moodHistory'));
+      const chartContainer = document.getElementById('moodChart');
+      
+      if (moodHistory.length === 0) {
+        chartContainer.innerHTML = `
+          <div class="no-data">
+            <i class="fas fa-chart-bar"></i>
+            <div>No mood data yet</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Add y-axis labels
+      chartContainer.innerHTML = `
+        <div class="mood-chart-y-axis">
+          <div class="mood-chart-y-label">10</div>
+          <div class="mood-chart-y-label">8</div>
+          <div class="mood-chart-y-label">6</div>
+          <div class="mood-chart-y-label">4</div>
+          <div class="mood-chart-y-label">2</div>
+          <div class="mood-chart-y-label">0</div>
+        </div>
+      `;
+      
+      // Display all entries, with scrolling if more than 20
+      const displayData = moodHistory;
+      
+      // Create bars
+      displayData.forEach(item => {
+        const height = `${item.score * 10}%`;
+        const date = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const time = new Date(item.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const context = item.context || 'chat';
+        
+        // Determine color based on context
+        let contextColor = '#0021A5'; // Default blue
+        let contextIcon = 'comment';
+        
+        if (context === 'mental') {
+          contextColor = '#0021A5'; // Blue for mental health
+          contextIcon = 'brain';
+        } else if (context === 'physical') {
+          contextColor = '#6ECCAF'; // Green for physical wellness
+          contextIcon = 'heartbeat';
+        } else if (context === 'journal_entry') {
+          contextColor = '#FA4616'; // Orange for journal
+          contextIcon = 'book';
+        }
+        
+        // Truncate message for tooltip (first 30 chars)
+        const shortMessage = item.message && item.message.length > 30 
+          ? item.message.substring(0, 30) + '...' 
+          : (item.message || 'No message');
+        
+        const barElement = document.createElement('div');
+        barElement.className = 'mood-bar';
+        barElement.setAttribute('data-score', item.score);
+        barElement.style.height = height;
+        barElement.style.background = `linear-gradient(to top, ${contextColor}, ${lightenColor(contextColor, 30)})`;
+        
+        // Add tooltip with more details
+        barElement.innerHTML = `
+          <div class="mood-bar-tooltip">
+            <strong>${item.score}/10</strong> - ${date} ${time}<br>
+            <small>${getContextName(context)}</small><br>
+            <small>"${shortMessage}"</small>
+          </div>
+          <div class="mood-date">
+            <i class="fas fa-${contextIcon}" style="font-size: 0.7rem; color: ${contextColor}"></i>
+          </div>
+        `;
+        
+        chartContainer.appendChild(barElement);
+      });
+      
+      // Add explanation below chart
+      const explanationDiv = document.createElement('div');
+      explanationDiv.style.marginTop = '40px';
+      explanationDiv.style.fontSize = '0.8rem';
+      explanationDiv.style.color = 'var(--gray-800)';
+      explanationDiv.innerHTML = `
+        <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center;">
+            <i class="fas fa-brain" style="color: #0021A5; margin-right: 5px;"></i> Mental Health
+          </div>
+          <div style="display: flex; align-items: center;">
+            <i class="fas fa-heartbeat" style="color: #6ECCAF; margin-right: 5px;"></i> Physical Wellness
+          </div>
+          <div style="display: flex; align-items: center;">
+            <i class="fas fa-book" style="color: #FA4616; margin-right: 5px;"></i> Journal
+          </div>
+        </div>
+        <div style="text-align: center;">Hover over bars to see details. The chart shows emotions from all interactions.</div>
+      `;
+      
+      // Add after chart container
+      chartContainer.parentElement.appendChild(explanationDiv);
+    }
+    
+    // Helper function to lighten a color for gradient
+    function lightenColor(color, percent) {
+      // Convert hex to RGB
+      let r, g, b;
+      if (color.startsWith('#')) {
+        r = parseInt(color.substring(1, 3), 16);
+        g = parseInt(color.substring(3, 5), 16);
+        b = parseInt(color.substring(5, 7), 16);
+      } else {
+        return color; // Not a hex color
+      }
+      
+      // Lighten
+      r = Math.min(255, r + (255 - r) * (percent / 100));
+      g = Math.min(255, g + (255 - g) * (percent / 100));
+      b = Math.min(255, b + (255 - b) * (percent / 100));
+      
+      // Convert back to hex
+      return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
+    }
+    
+    // Helper to get friendly context names
+    function getContextName(context) {
+      switch(context) {
+        case 'mental': return 'Mental Health';
+        case 'physical': return 'Physical Wellness';
+        case 'journal_entry': return 'Journal Entry';
+        default: return 'Chat';
+      }
+    }
+    
+    // Check user wellness and show alerts if needed
+    function checkWellness() {
+      const moodHistory = JSON.parse(localStorage.getItem('moodHistory'));
+      if (moodHistory.length < 5) return; // Need at least 5 entries to check
+      
+      // Check last 7 entries
+      const recentEntries = moodHistory.slice(-7);
+      const averageScore = recentEntries.reduce((sum, item) => sum + item.score, 0) / recentEntries.length;
+      
+      // If average mood is below 4 for a week, show alert
+      if (averageScore < 4) {
+        document.getElementById('alert-mental').style.display = 'block';
+      } else {
+        document.getElementById('alert-mental').style.display = 'none';
+      }
+    }
+    
+    // Allow sending messages with Enter key
+    document.getElementById("userInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        sendMessage('mental');
+      }
+    });
+    
+    document.getElementById("physicalInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        sendMessage('physical');
+      }
+    });
+    
+    // Load journal entries on page load
+    loadJournalEntries();
+    
+    // Canvas API Integration Functions
+    function initializeCanvasIntegration() {
+      // Check if Canvas token exists in localStorage
+      const canvasToken = localStorage.getItem('canvasToken');
+      const canvasUrl = localStorage.getItem('canvasUrl') || 'https://ufl.instructure.com';
+      
+      if (canvasToken) {
+        // Show connected state and fetch data
+        document.getElementById('canvasUrl').value = canvasUrl;
+        document.getElementById('canvas-setup').style.display = 'none';
+        document.getElementById('canvas-data').style.display = 'block';
+        fetchCanvasData(canvasUrl, canvasToken);
+      }
+      
+      // Set up event listeners
+      document.getElementById('connectCanvas').addEventListener('click', connectToCanvas);
+      document.getElementById('refreshCanvas').addEventListener('click', refreshCanvasData);
+      document.getElementById('disconnectCanvas').addEventListener('click', disconnectCanvas);
+    }
+    
+    async function connectToCanvas() {
+      const canvasUrl = document.getElementById('canvasUrl').value.trim();
+      const canvasToken = document.getElementById('canvasToken').value.trim();
+      
+      if (!canvasToken) {
+        showNotification('Please enter your Canvas API token', 'error');
+        return;
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('canvasToken', canvasToken);
+      localStorage.setItem('canvasUrl', canvasUrl);
+      
+      // Update UI
+      document.getElementById('canvas-setup').style.display = 'none';
+      document.getElementById('canvas-data').style.display = 'block';
+      
+      // Fetch data
+      await fetchCanvasData(canvasUrl, canvasToken);
+    }
+    
+    async function fetchCanvasData(canvasUrl, canvasToken) {
+      try {
+        // Show loading state
+        document.getElementById('canvas-courses').innerHTML = `
+          <div class="canvas-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading your courses...
+          </div>
+        `;
+        
+        // Call the backend
+        const response = await fetch('/canvas_data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            canvas_url: canvasUrl,
+            api_token: canvasToken
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch Canvas data');
+        }
+        
+        const data = await response.json();
+        displayCanvasCourses(data.courses);
+        
+      } catch (error) {
+        console.error('Canvas error:', error);
+        document.getElementById('canvas-courses').innerHTML = `
+          <div class="canvas-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Error loading Canvas data: ${error.message}</p>
+            <button id="retryCanvas" class="btn-secondary">Retry</button>
+          </div>
+        `;
+        
+        document.getElementById('retryCanvas').addEventListener('click', refreshCanvasData);
+      }
+    }
+    
+    function displayCanvasCourses(courses) {
+      if (!courses || courses.length === 0) {
+        document.getElementById('canvas-courses').innerHTML = `
+          <div class="canvas-no-data">
+            <i class="fas fa-info-circle"></i>
+            <p>No active courses found in your Canvas account.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Calculate overall GPA
+      let totalScore = 0;
+      let courseCount = 0;
+      
+      courses.forEach(course => {
+        if (course.score) {
+          totalScore += parseFloat(course.score);
+          courseCount++;
+        }
+      });
+      
+      const avgScore = courseCount > 0 ? (totalScore / courseCount).toFixed(1) : 'N/A';
+      
+      // Create courses HTML
+      const coursesHtml = courses.map(course => {
+        const score = course.score || 'N/A';
+        const grade = course.grade || getGradeFromScore(score);
+        const progressPercent = score === 'N/A' ? 0 : Math.min(parseFloat(score), 100);
+        
+        // Count pending assignments
+        const pendingAssignments = course.assignments.filter(assignment => {
+          const dueDate = new Date(assignment.due_at);
+          const now = new Date();
+          return dueDate > now;
+        }).length;
+        
+        return `
+          <div class="course-item canvas-course">
+            <div class="course-header">
+              <div class="course-name">${course.code || course.name}</div>
+              <div class="course-grade">${grade}</div>
+            </div>
+            <div class="course-progress">
+              <div class="progress-bar" style="width: ${progressPercent}%"></div>
+            </div>
+            <div class="course-details">
+              <div class="course-stat">
+                <div class="stat-label">Score</div>
+                <div class="stat-value">${score}%</div>
+              </div>
+              <div class="course-stat">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value">${pendingAssignments}</div>
+              </div>
+              <div class="course-stat">
+                <div class="stat-label">ID</div>
+                <div class="stat-value small">${course.id}</div>
+              </div>
+            </div>
+            <button class="course-details-btn" data-course-id="${course.id}">
+              <i class="fas fa-chevron-down"></i> Details
+            </button>
+            <div class="course-expanded" id="course-expanded-${course.id}" style="display: none;">
+              <h4>Upcoming Assignments</h4>
+              <div class="assignments-list">
+                ${getUpcomingAssignmentsHtml(course.assignments)}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Update the container
+      document.getElementById('canvas-courses').innerHTML = `
+        <div class="canvas-summary">
+          <div class="summary-stat">
+            <div class="summary-value">${courses.length}</div>
+            <div class="summary-label">Courses</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-value">${avgScore}</div>
+            <div class="summary-label">Avg. Score</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-value">${getGpaFromScore(avgScore)}</div>
+            <div class="summary-label">Est. GPA</div>
+          </div>
+        </div>
+        <div class="canvas-courses-list">
+          ${coursesHtml}
+        </div>
+      `;
+      
+      // Add event listeners for course detail toggles
+      document.querySelectorAll('.course-details-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const courseId = btn.getAttribute('data-course-id');
+          const expandedSection = document.getElementById(`course-expanded-${courseId}`);
+          
+          // Toggle visibility
+          if (expandedSection.style.display === 'none') {
+            expandedSection.style.display = 'block';
+            btn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide';
+          } else {
+            expandedSection.style.display = 'none';
+            btn.innerHTML = '<i class="fas fa-chevron-down"></i> Details';
+          }
+        });
+      });
+    }
+    
+    function getUpcomingAssignmentsHtml(assignments) {
+      // Filter and sort upcoming assignments
+      const upcomingAssignments = assignments
+        .filter(assignment => {
+          if (!assignment.due_at) return false;
+          const dueDate = new Date(assignment.due_at);
+          const now = new Date();
+          return dueDate > now;
+        })
+        .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
+        .slice(0, 5); // Show only 5 most recent
+      
+      if (upcomingAssignments.length === 0) {
+        return '<div class="no-assignments">No upcoming assignments</div>';
+      }
+      
+      return upcomingAssignments.map(assignment => {
+        const dueDate = new Date(assignment.due_at);
+        const formattedDate = dueDate.toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        return `
+          <div class="assignment-item">
+            <div class="assignment-name">${assignment.name}</div>
+            <div class="assignment-due">Due: ${formattedDate}</div>
+            <div class="assignment-points">Points: ${assignment.points_possible}</div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function refreshCanvasData() {
+      const canvasUrl = localStorage.getItem('canvasUrl');
+      const canvasToken = localStorage.getItem('canvasToken');
+      
+      if (canvasToken) {
+        fetchCanvasData(canvasUrl, canvasToken);
+      }
+    }
+    
+    function disconnectCanvas() {
+      // Remove from localStorage
+      localStorage.removeItem('canvasToken');
+      
+      // Update UI
+      document.getElementById('canvas-setup').style.display = 'block';
+      document.getElementById('canvas-data').style.display = 'none';
+      document.getElementById('canvasToken').value = '';
+    }
+    
+    function getGradeFromScore(score) {
+      if (score === 'N/A') return 'N/A';
+      
+      const numScore = parseFloat(score);
+      if (numScore >= 93) return 'A';
+      if (numScore >= 90) return 'A-';
+      if (numScore >= 87) return 'B+';
+      if (numScore >= 83) return 'B';
+      if (numScore >= 80) return 'B-';
+      if (numScore >= 77) return 'C+';
+      if (numScore >= 73) return 'C';
+      if (numScore >= 70) return 'C-';
+      if (numScore >= 67) return 'D+';
+      if (numScore >= 63) return 'D';
+      if (numScore >= 60) return 'D-';
+      return 'F';
+    }
+    
+    function getGpaFromScore(score) {
+      if (score === 'N/A') return 'N/A';
+      
+      const numScore = parseFloat(score);
+      if (numScore >= 93) return '4.0';
+      if (numScore >= 90) return '3.7';
+      if (numScore >= 87) return '3.3';
+      if (numScore >= 83) return '3.0';
+      if (numScore >= 80) return '2.7';
+      if (numScore >= 77) return '2.3';
+      if (numScore >= 73) return '2.0';
+      if (numScore >= 70) return '1.7';
+      if (numScore >= 67) return '1.3';
+      if (numScore >= 63) return '1.0';
+      if (numScore >= 60) return '0.7';
+      return '0.0';
+    }
+    
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.position = 'fixed';
+      notification.style.bottom = '20px';
+      notification.style.right = '20px';
+      notification.style.backgroundColor = type === 'error' ? '#ff4444' : '#4CAF50';
+      notification.style.color = 'white';
+      notification.style.padding = '1rem';
+      notification.style.borderRadius = '8px';
+      notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+      notification.style.zIndex = '1000';
+      notification.style.animation = 'slideInRight 0.3s ease';
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+          <div>${message}</div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+    
+    // Initialize Canvas Integration
+    initializeCanvasIntegration();
+    
+    // Add course details expand/collapse functionality
+    document.querySelectorAll('.course-details-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const courseId = btn.getAttribute('data-course-id');
+        const expandedSection = document.getElementById(`course-expanded-${courseId}`);
+        
+        // Toggle visibility
+        if (expandedSection.style.display === 'none') {
+          expandedSection.style.display = 'block';
+          btn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide';
+        } else {
+          expandedSection.style.display = 'none';
+          btn.innerHTML = '<i class="fas fa-chevron-down"></i> Details';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

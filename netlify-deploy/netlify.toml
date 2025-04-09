@@ -1,0 +1,25 @@
+[build]
+  publish = "/"
+  
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/"
+  to = "/static/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/chat"
+  to = "https://your-backend-url.com/chat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/analyze_journal"
+  to = "https://your-backend-url.com/analyze_journal"
+  status = 200
+  force = true
+
+[dev]
+  framework = "#static" 

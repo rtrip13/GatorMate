@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GatorMind Pricing Tiers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0275d8;
+            --primary-red: #d9534f;
+            --light-gray: #f8f9fa;
+            --dark: #333;
+            --text: #495057;
+            --check-green: #5cb85c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: white;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 50px;
+        }
+        
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            height: 4px;
+            background-color: var(--primary-blue);
+            left: 50px;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        
+        .timeline-point {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-point.home {
+            background-color: var(--primary-red);
+        }
+        
+        .pricing-tiers {
+            display: flex;
+            justify-content: space-between;
+            gap: 25px;
+        }
+        
+        .pricing-card {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background-color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .pricing-header {
+            padding: 25px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .tier-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .tier-duration {
+            font-size: 1.2rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .blue-header {
+            background-color: var(--primary-blue);
+        }
+        
+        .red-header {
+            background-color: var(--primary-red);
+        }
+        
+        .pricing-icon {
+            width: 90px;
+            height: 90px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin: 25px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .pricing-features {
+            padding: 30px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .feature-check {
+            color: var(--check-green);
+            font-size: 1.5rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .feature-text {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .feature-subtext {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+        
+        .tier-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary-blue);
+            margin-top: 130px;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        
+        .tier-button {
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .tier-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .blue-button {
+            background-color: var(--primary-blue);
+        }
+        
+        .red-button {
+            background-color: var(--primary-red);
+        }
+        
+        @media (max-width: 992px) {
+            .pricing-tiers {
+                flex-direction: column;
+            }
+            
+            .tier-arrow {
+                transform: rotate(90deg);
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">GatorMind Subscription Plans</h1>
+        
+        <div class="timeline">
+            <div class="timeline-point">
+                <span>🚀</span>
+            </div>
+            <div class="timeline-point home">
+                <span>🏠</span>
+            </div>
+            <div class="timeline-point">
+                <span>🎯</span>
+            </div>
+        </div>
+        
+        <div class="pricing-tiers">
+            <div class="pricing-card">
+                <div class="pricing-header blue-header">
+                    <h2 class="tier-name">Starter Tier</h2>
+                    <p class="tier-duration">3 Months</p>
+                </div>
+                <div class="pricing-icon">
+                    <span>🚀</span>
+                </div>
+                <div class="pricing-features">
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">$500 Credit Limit</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">1% Cash Back (All Purchases)</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">6% Experiences Cash Back</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">1,000 Points</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tier-arrow">→</div>
+            
+            <div class="pricing-card">
+                <div class="pricing-header red-header">
+                    <h2 class="tier-name">Builder Tier</h2>
+                    <p class="tier-duration">6 Months</p>
+                </div>
+                <div class="pricing-icon">
+                    <span>🏠</span>
+                </div>
+                <div class="pricing-features">
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">$1,000 Credit Limit</div>
+                            <div class="feature-subtext">with potential for increase</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">3% Cash Back (Selected Categories)</div>
+                            <div class="feature-subtext">1.5% other</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">7% Experiences Cash Back</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">2,500 Points</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tier-arrow">→</div>
+            
+            <div class="pricing-card">
+                <div class="pricing-header blue-header">
+                    <h2 class="tier-name">Premium Tier</h2>
+                    <p class="tier-duration">Ongoing</p>
+                </div>
+                <div class="pricing-icon">
+                    <span>🎯</span>
+                </div>
+                <div class="pricing-features">
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">Based on Builder Tier Spending</div>
+                            <div class="feature-subtext">Credit Limit</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">4% Cash Back (Selected Categories)</div>
+                            <div class="feature-subtext">2% other</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">8% Experiences Cash Back</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-check">✓</span>
+                        <div class="feature-content">
+                            <div class="feature-text">5,000 Points</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <button class="tier-button blue-button">Start Here</button>
+            <button class="tier-button red-button">Next Step</button>
+            <button class="tier-button blue-button">Final Tier</button>
+        </div>
+    </div>
+</body>
+</html> 
